@@ -17,6 +17,12 @@ Download the latest release from the [Releases page](https://github.com/madratzz
 Download `Gmail.Desktop_x.x.x_aarch64.dmg` (Apple Silicon) or `Gmail.Desktop_x.x.x_x64.dmg` (Intel), open it, and drag the app to your Applications folder.
 
 > If macOS blocks the app on first launch, right-click the app and choose Open.
+>
+> If macOS says `"Gmail Desktop" is damaged and can't be opened`, the downloaded build was not signed and notarized. Delete that copy and install a signed release. For your own local unsigned test build only, you can remove the quarantine flag after copying it to Applications:
+>
+> ```sh
+> xattr -dr com.apple.quarantine "/Applications/Gmail Desktop.app"
+> ```
 
 ### Windows
 
@@ -82,6 +88,19 @@ npm run build
 ```
 
 The bundled app will be created under `src-tauri/target/release/bundle`.
+
+## Release Signing
+
+macOS release DMGs must be signed and notarized. Add these GitHub Actions secrets before publishing a release:
+
+- `APPLE_CERTIFICATE`: base64-encoded Developer ID Application certificate exported as a `.p12`
+- `APPLE_CERTIFICATE_PASSWORD`: password for the exported `.p12`
+- `APPLE_SIGNING_IDENTITY`: Developer ID Application signing identity
+- `APPLE_ID`: Apple ID used for notarization
+- `APPLE_PASSWORD`: app-specific password for the Apple ID
+- `APPLE_TEAM_ID`: Apple Developer Team ID
+
+The release workflow builds separate Intel and Apple Silicon macOS artifacts and fails early if the signing secrets are missing.
 
 ## Notes
 
