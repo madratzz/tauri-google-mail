@@ -8,6 +8,47 @@ The Icon menu can switch the active window icon between the color, dark, and whi
 
 Links that open in a new tab appear as an in-app peek overlay. The overlay toolbar lets you pop the link out into a full standalone window or close it.
 
+## Installation
+
+Download the latest release from the [Releases page](https://github.com/madratzz/tauri-google-mail/releases).
+
+### macOS
+
+Download `Gmail.Desktop_x.x.x_aarch64.dmg` (Apple Silicon) or `Gmail.Desktop_x.x.x_x64.dmg` (Intel), open it, and drag the app to your Applications folder.
+
+> If macOS blocks the app on first launch, right-click the app and choose Open.
+
+### Windows
+
+Download `Gmail.Desktop_x.x.x_x64-setup.exe` and run the installer, or download the `.msi` for a standard Windows Installer package.
+
+### Linux (Ubuntu / Debian)
+
+Download the `.deb` package and install it:
+
+```sh
+sudo dpkg -i gmail-desktop_x.x.x_amd64.deb
+```
+
+### Linux (Arch)
+
+Download the `.pkg.tar.zst` package and install it with pacman:
+
+```sh
+sudo pacman -U gmail-desktop-x.x.x-1-x86_64.pkg.tar.zst
+```
+
+### Linux (AppImage)
+
+Download the `.AppImage`, make it executable, and run it:
+
+```sh
+chmod +x gmail-desktop_x.x.x_amd64.AppImage
+./gmail-desktop_x.x.x_amd64.AppImage
+```
+
+---
+
 ## Requirements
 
 - Node.js 18+
