@@ -19,6 +19,9 @@
       "icons/icon.ico"
     ],
     "category": "Productivity",
+    "macOS": {
+      "signingIdentity": "-"
+    },
     "shortDescription": "Gmail desktop app",
     "longDescription": "A Tauri desktop wrapper for Gmail."
   }
