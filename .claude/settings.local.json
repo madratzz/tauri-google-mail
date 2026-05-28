@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh api *)",
+      "Bash(npm --version)",
+      "Bash(rustc --version)",
+      "Bash(cargo --version)",
+      "PowerShell(Get-Command *)",
+      "Bash(gh auth *)",
+      "Bash(New-Item -ItemType Directory -Force \"E:\\\\GitProjects\\\\tauri-google-mail\\\\src-tauri\\\\src\")",
+      "Bash(Out-Null)",
+      "Bash(New-Item -ItemType Directory -Force \"E:\\\\GitProjects\\\\tauri-google-mail\\\\src-tauri\\\\icons\")",
+      "Bash(New-Item -ItemType Directory -Force \"E:\\\\GitProjects\\\\tauri-google-mail\\\\src-tauri\\\\capabilities\")",
+      "Bash(New-Item -ItemType Directory -Force \"E:\\\\GitProjects\\\\tauri-google-mail\\\\.github\\\\workflows\")"
+    ]
+  }
+}
