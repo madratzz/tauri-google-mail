@@ -1,4 +1,4 @@
-use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::{atomic::{AtomicU64, Ordering}, Mutex};
 
 use tauri::{
     image::Image,
@@ -6,6 +6,11 @@ use tauri::{
     webview::{NewWindowResponse, PageLoadEvent, WebviewBuilder},
     LogicalPosition, LogicalSize, Manager, WebviewUrl, WebviewWindowBuilder,
 };
+
+// Stores the URL of the active peek overlay so expand_peek can read it
+// reliably. On Windows/WebView2, peek.url() may return the sentinel URL
+// by the time expand_peek is called because navigation cancel is async.
+struct PeekUrl(Mutex<Option<tauri::Url>>);
 
 const GMAIL_URL: &str = "https://mail.google.com/";
 const SAFARI_USER_AGENT: &str = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.4 Safari/605.1.15";
@@ -52,6 +57,7 @@ const PEEK_TOOLBAR_JS: &str = r#"
 
 pub fn run() {
     tauri::Builder::default()
+        .manage(PeekUrl(Mutex::new(None)))
         .setup(|app| {
             let app_handle = app.handle().clone();
             let app_resize = app.handle().clone();
@@ -180,6 +186,12 @@ fn create_peek_overlay(app: &tauri::AppHandle, url: tauri::Url) {
         let _ = existing.close();
     }
 
+    // Store URL in state before creating the webview so expand_peek can
+    // read the original URL even if peek.url() has drifted on Windows.
+    if let Ok(mut guard) = app.state::<PeekUrl>().0.lock() {
+        *guard = Some(url.clone());
+    }
+
     let Some(main_window) = app.get_window("main") else {
         return;
     };
@@ -215,32 +227,89 @@ fn create_peek_overlay(app: &tauri::AppHandle, url: tauri::Url) {
 }
 
 fn expand_peek(app: &tauri::AppHandle) {
-    let Some(peek) = app.get_webview("peek") else {
-        return;
+    // Read the URL from stored state — do NOT use peek.url() here.
+    // On Windows/WebView2, on_navigation cancel is asynchronous, so peek.url()
+    // may already reflect the sentinel URL by the time this function runs,
+    // producing a blank white window.
+    let url = {
+        let state = app.state::<PeekUrl>();
+        let guard = state.0.lock().unwrap();
+        match guard.clone() {
+            Some(u) => u,
+            None => return,
+        }
     };
-    let url = match peek.url() {
-        Ok(u) => u,
-        Err(_) => return,
-    };
-    let _ = peek.close();
+
+    if let Some(peek) = app.get_webview("peek") {
+        let _ = peek.close();
+    }
 
     let label = child_window_label(&url);
     let app_clone = app.clone();
-    let label_clone = label.clone();
 
-    let _ = WebviewWindowBuilder::new(app, label, WebviewUrl::External(url.clone()))
+    let result = WebviewWindowBuilder::new(app, label, WebviewUrl::External(url.clone()))
         .title(title_for_url(&url))
         .inner_size(1180.0, 820.0)
         .min_inner_size(820.0, 560.0)
         .resizable(true)
+        .focused(true)
         .user_agent(SAFARI_USER_AGENT)
-        .on_new_window(move |url, _| {
-            if let Some(win) = app_clone.get_webview_window(&label_clone) {
-                let _ = win.navigate(url);
-            }
+        // Suppress beforeunload dialogs so the close button always works on Windows.
+        .initialization_script(
+            "window.addEventListener('beforeunload',function(e){delete e.returnValue;},true);",
+        )
+        .on_new_window(move |new_url, _| {
+            // Open nested links as additional standalone windows. Do NOT call
+            // win.navigate() from inside this callback — on Windows/WebView2
+            // that corrupts the webview navigation state and breaks the close button.
+            open_standalone_window(&app_clone, new_url);
             NewWindowResponse::Deny
         })
         .build();
+
+    // Force-close on X so Windows' native close button always works even if
+    // WebView2 tries to re-raise a beforeunload confirmation.
+    if let Ok(win) = result {
+        let win_clone = win.clone();
+        win.on_window_event(move |event| {
+            if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+                api.prevent_close();
+                let _ = win_clone.destroy();
+            }
+        });
+    }
+}
+
+/// Opens a URL in a fresh standalone window. Used by expanded windows when
+/// they encounter a link that would open a new tab.
+fn open_standalone_window(app: &tauri::AppHandle, url: tauri::Url) {
+    let label = child_window_label(&url);
+    let app_clone = app.clone();
+    let result = WebviewWindowBuilder::new(app, label, WebviewUrl::External(url.clone()))
+        .title(title_for_url(&url))
+        .inner_size(1180.0, 820.0)
+        .min_inner_size(820.0, 560.0)
+        .resizable(true)
+        .focused(true)
+        .user_agent(SAFARI_USER_AGENT)
+        .initialization_script(
+            "window.addEventListener('beforeunload',function(e){delete e.returnValue;},true);",
+        )
+        .on_new_window(move |new_url, _| {
+            open_standalone_window(&app_clone, new_url);
+            NewWindowResponse::Deny
+        })
+        .build();
+
+    if let Ok(win) = result {
+        let win_clone = win.clone();
+        win.on_window_event(move |event| {
+            if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+                api.prevent_close();
+                let _ = win_clone.destroy();
+            }
+        });
+    }
 }
 
 fn close_peek(app: &tauri::AppHandle) {
