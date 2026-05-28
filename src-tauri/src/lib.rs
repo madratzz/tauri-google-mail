@@ -203,9 +203,16 @@ fn create_peek_overlay(app: &tauri::AppHandle, url: tauri::Url) {
         .user_agent(SAFARI_USER_AGENT)
         .on_navigation(move |nav_url| {
             if nav_url.host_str() == Some("peek-action.tauri.internal") {
+                // Spawn onto the async runtime so this callback returns immediately.
+                // On Windows, on_navigation fires on the WebView2 background thread.
+                // Calling peek.close() or WebviewWindowBuilder::new() directly here
+                // deadlocks: those ops need the main thread, but the main thread is
+                // waiting for this callback to return. macOS is unaffected because
+                // WKWebView fires navigation callbacks on the main thread already.
+                let app = app_for_nav.clone();
                 match nav_url.path() {
-                    "/expand" => expand_peek(&app_for_nav),
-                    "/close" => close_peek(&app_for_nav),
+                    "/expand" => { tauri::async_runtime::spawn(async move { expand_peek(&app); }); }
+                    "/close"  => { tauri::async_runtime::spawn(async move { close_peek(&app); }); }
                     _ => {}
                 }
                 return false;
