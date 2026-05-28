@@ -10,6 +10,9 @@ jobs:
   publish-tauri:
     permissions:
       contents: write
+    concurrency:
+      group: release-${{ github.ref }}
+      cancel-in-progress: false
     strategy:
       fail-fast: false
       matrix:
@@ -25,7 +28,7 @@ jobs:
     steps:
       - name: bootstrap arch linux
         if: matrix.container == 'archlinux:latest'
-        run: pacman -Sy --noconfirm git curl
+        run: pacman -Sy --noconfirm git curl base-devel
 
       - uses: actions/checkout@v4
 
