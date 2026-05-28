@@ -89,19 +89,6 @@ npm run build
 
 The bundled app will be created under `src-tauri/target/release/bundle`.
 
-## Release Signing
-
-macOS release DMGs must be signed and notarized. Add these GitHub Actions secrets before publishing a release:
-
-- `APPLE_CERTIFICATE`: base64-encoded Developer ID Application certificate exported as a `.p12`
-- `APPLE_CERTIFICATE_PASSWORD`: password for the exported `.p12`
-- `APPLE_SIGNING_IDENTITY`: Developer ID Application signing identity
-- `APPLE_ID`: Apple ID used for notarization
-- `APPLE_PASSWORD`: app-specific password for the Apple ID
-- `APPLE_TEAM_ID`: Apple Developer Team ID
-
-The release workflow builds separate Intel and Apple Silicon macOS artifacts and fails early if the signing secrets are missing.
-
 ## Notes
 
 Gmail authentication happens inside the Tauri webview. If Google blocks sign-in because it does not trust the embedded browser on your platform, use Gmail in your system browser instead.

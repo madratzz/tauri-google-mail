@@ -14,18 +14,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: 'macos-13'
-            args: '--target x86_64-apple-darwin'
-            rust-target: 'x86_64-apple-darwin'
           - platform: 'macos-latest'
-            args: '--target aarch64-apple-darwin'
-            rust-target: 'aarch64-apple-darwin'
           - platform: 'ubuntu-latest'
-            args: ''
-            rust-target: ''
           - platform: 'windows-latest'
-            args: ''
-            rust-target: ''
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -39,10 +30,6 @@ jobs:
       - name: install Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: install macOS Rust target
-        if: startsWith(matrix.platform, 'macos-')
-        run: rustup target add ${{ matrix.rust-target }}
-
       - name: install dependencies (ubuntu only)
         if: matrix.platform == 'ubuntu-latest'
         run: |
@@ -52,37 +39,11 @@ jobs:
       - name: install node dependencies
         run: npm ci
 
-      - name: validate macOS signing secrets
-        if: startsWith(matrix.platform, 'macos-')
-        env:
-          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
-          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-        run: |
-          missing=0
-          for name in APPLE_CERTIFICATE APPLE_CERTIFICATE_PASSWORD APPLE_SIGNING_IDENTITY APPLE_ID APPLE_PASSWORD APPLE_TEAM_ID; do
-            if [ -z "${!name}" ]; then
-              echo "::error::Missing $name. macOS releases must be signed and notarized or Gatekeeper may show the app as damaged."
-              missing=1
-            fi
-          done
-          exit "$missing"
-
       - name: build and release
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
-          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         with:
-          args: ${{ matrix.args }}
           tagName: ${{ github.ref_name }}
           releaseName: 'Gmail Desktop ${{ github.ref_name }}'
           releaseBody: 'See the assets to download this version and install.'
