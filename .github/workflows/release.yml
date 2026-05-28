@@ -10,9 +10,6 @@ jobs:
   publish-tauri:
     permissions:
       contents: write
-    concurrency:
-      group: release-${{ github.ref }}
-      cancel-in-progress: false
     strategy:
       fail-fast: false
       matrix:
@@ -20,16 +17,9 @@ jobs:
           - platform: 'macos-latest'
           - platform: 'ubuntu-latest'
           - platform: 'windows-latest'
-          - platform: 'ubuntu-latest'
-            container: 'archlinux:latest'
 
     runs-on: ${{ matrix.platform }}
-    container: ${{ matrix.container }}
     steps:
-      - name: bootstrap arch linux
-        if: matrix.container == 'archlinux:latest'
-        run: pacman -Sy --noconfirm git curl base-devel
-
       - uses: actions/checkout@v4
 
       - name: setup node
@@ -40,15 +30,11 @@ jobs:
       - name: install Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: install dependencies (ubuntu)
-        if: matrix.platform == 'ubuntu-latest' && matrix.container != 'archlinux:latest'
+      - name: install dependencies (ubuntu only)
+        if: matrix.platform == 'ubuntu-latest'
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
-
-      - name: install dependencies (arch linux)
-        if: matrix.container == 'archlinux:latest'
-        run: pacman -S --noconfirm webkit2gtk-4.1 libappindicator-gtk3 librsvg patchelf
 
       - name: install node dependencies
         run: npm ci
@@ -63,3 +49,102 @@ jobs:
           releaseBody: 'See the assets to download this version and install.'
           releaseDraft: true
           prerelease: false
+
+  publish-tauri-arch:
+    needs: publish-tauri
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux/archlinux:latest
+    steps:
+      - name: Install git
+        run: pacman -Sy --noconfirm git
+
+      - uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+          pacman -S --noconfirm \
+            base-devel \
+            webkit2gtk-4.1 \
+            libayatana-appindicator \
+            librsvg \
+            patchelf \
+            nodejs \
+            npm \
+            dpkg \
+            curl
+
+      - name: Install Rust
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path
+          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+
+      - name: Install node dependencies
+        run: npm ci
+
+      - name: Build Tauri app
+        run: |
+          source "$HOME/.cargo/env"
+          npm run tauri build -- --bundles deb
+
+      - name: Create Arch package (.pkg.tar.zst)
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          if [ -z "$VERSION" ]; then
+            VERSION=$(grep '^version' src-tauri/Cargo.toml | head -1 | sed 's/.*"\(.*\)"/\1/')
+          fi
+
+          STAGING="$(pwd)/staging"
+          mkdir -p "$STAGING/usr/bin" "$STAGING/usr/share/pixmaps" "$STAGING/usr/share/applications"
+
+          install -m755 src-tauri/target/release/gmail-desktop \
+            "$STAGING/usr/bin/gmail-desktop"
+          install -m644 src-tauri/icons/icon.png \
+            "$STAGING/usr/share/pixmaps/gmail-desktop.png"
+
+          printf '%s\n' \
+            '[Desktop Entry]' \
+            'Name=Gmail Desktop' \
+            'Exec=gmail-desktop' \
+            'Icon=gmail-desktop' \
+            'Type=Application' \
+            'Categories=Network;Email;' \
+            'Comment=A Tauri desktop wrapper for Gmail' \
+            > "$STAGING/usr/share/applications/gmail-desktop.desktop"
+
+          SIZE=$(du -sk "$STAGING" | awk '{print $1 * 1024}')
+          printf '%s\n' \
+            'pkgname = gmail-desktop' \
+            "pkgver = ${VERSION}-1" \
+            'pkgdesc = A Tauri desktop wrapper for Gmail' \
+            'url = https://github.com/madratzz/tauri-google-mail' \
+            "builddate = $(date +%s)" \
+            'packager = GitHub Actions' \
+            "size = $SIZE" \
+            'arch = x86_64' \
+            'depend = webkit2gtk-4.1' \
+            'depend = libayatana-appindicator' \
+            > "$STAGING/.PKGINFO"
+
+          cd "$STAGING"
+          tar --zstd -cf "../gmail-desktop-${VERSION}-1-x86_64.pkg.tar.zst" .
+
+      - name: Update PKGBUILD version and checksum
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          sed -i "s/^pkgver=.*/pkgver=$VERSION/" PKGBUILD
+          SHA=$(curl -sL "https://github.com/madratzz/tauri-google-mail/archive/v${VERSION}.tar.gz" | sha256sum | cut -d' ' -f1)
+          sed -i "s/^sha256sums=.*/sha256sums=('$SHA')/" PKGBUILD
+
+      - name: Upload Arch artifacts to release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            gmail-desktop-*-x86_64.pkg.tar.zst
+            PKGBUILD
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
