@@ -1,6 +1,8 @@
 # Master Archive Index
 
-Last updated: 2026-05-28
+Schema version: 1
+
+Last updated: 2026-09-14
 
 ## Archive Categories
 
@@ -14,4 +16,4 @@ Last updated: 2026-05-28
 
 ## Notes
 
-Archive indexes are maintained in recent-to-oldest order.
+Category indexes list snapshots in recent-to-oldest order.

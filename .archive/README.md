@@ -1,12 +1,10 @@
 # Archive
 
-This folder stores older AI-agent context, logs, memory, learnings, and agent-specific files.
+Schema version: 1
 
-Active files live in `../.agents/`.
+This folder stores immutable, dated AI-agent context, logs, memory, learnings, and agent-specific files. Active files live in `../.agents/`.
 
-Archived files are dated and may include a short descriptive slug for easier lookup.
-
-Do not delete archived context unless the user explicitly asks for it.
+Archived files may include a short descriptive slug for lookup. Do not delete archived context unless the user explicitly asks; redact sensitive data rather than copying it into a snapshot.
 
 ## Archive Categories
 
