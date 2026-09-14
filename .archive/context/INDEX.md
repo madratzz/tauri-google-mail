@@ -1,7 +1,9 @@
 # Archived Context Index
 
-Last updated: 2026-05-28
+Schema version: 1
+
+Last updated: 2026-09-14
 
 | Date | File | Summary |
 |---|---|---|
-| — | — | No archived context yet. Active context is in [../../.agents/context.md](../../.agents/context.md). |
+| 2026-05-28 | [context-2026-05-28-initial-project-bootstrap.md](context-2026-05-28-initial-project-bootstrap.md) | Initial project architecture and decisions |

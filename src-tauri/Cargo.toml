@@ -1,6 +1,6 @@
 [package]
 name = "gmail-desktop"
-version = "1.0.0"
+version = "1.1.29823021"
 description = "A Tauri desktop wrapper for Gmail"
 authors = ["madratzz"]
 edition = "2021"
