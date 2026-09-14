@@ -4,6 +4,27 @@ Last updated: 2026-09-14
 
 ## Current Session
 
+### 2026-09-14T15:45:53+05:00 — codex/root
+
+Created and published GitHub release `v1.1.29823021` after merging the icon release through feature-to-development and development-to-master pull requests. Verified the Apple Silicon DMG against its published SHA-256 digest and strict code signature, then installed it as `/Applications/Gmail Desktop.app`.
+
+Files and release state:
+
+- Release: `Gmail Desktop v1.1.29823021`.
+- Installed bundle version: `1.1.29823021`, signature verified.
+- Previous application preserved as `/Applications/Gmail Desktop.app.backup-v1.0.0`.
+- GitHub Actions: Ubuntu and macOS builds succeeded; the Windows `build and release` step failed. The macOS release assets were available and verified before installation.
+
+Decisions made:
+
+- Created `development` from the existing `master` base, then used regular merge commits for both required pull requests.
+- Retained the previous installed app as a recoverable backup instead of deleting it.
+
+Next steps:
+
+- Investigate and rerun the failed Windows release job before relying on a Windows installer for this version.
+- Documentation review: this log records the published release, installation, verification, and outstanding platform-build status.
+
 ### 2026-09-14T15:21:14+05:00 — codex/root
 
 Replaced the primary Gmail launcher icon with a faithful square rendition of the supplied current Google Mail mark and regenerated Tauri’s desktop icon formats. Updated the app version to `1.1.29823021` in every package and Tauri manifest.
