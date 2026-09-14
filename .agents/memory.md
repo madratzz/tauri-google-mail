@@ -1,59 +1,47 @@
 # Active Memory
 
-Last updated: 2026-05-28
+Last updated: 2026-09-14
 
 ## Stable Project Facts
 
-- App name: **Gmail Desktop**, identifier: `com.madratzz.gmail-desktop`.
-- Crate name: `gmail-desktop`, lib name: `gmail_desktop_lib`.
-- Version: `1.0.0` (tauri.conf.json + Cargo.toml). Latest tag: `v1.0.0-alpha.1`.
-- Main URL loaded: `https://mail.google.com`.
-- User-agent constant: Safari 17.x on macOS — required for Google to allow Gmail to load.
-- All app logic in one file: `src-tauri/src/lib.rs`.
-- No frontend framework. No `index.html`. No Vite. No bundler.
-- Tauri feature `unstable` is required — used for `window.add_child()` (peek overlay).
+- Product name: Gmail Desktop. Bundle identifier: `com.madratzz.gmail-desktop`.
+- Rust package: `gmail-desktop`; library: `gmail_desktop_lib`.
+- Current manifest version: `1.1.29823021` in `package.json`, `package-lock.json`, `src-tauri/Cargo.toml`, and `src-tauri/tauri.conf.json` (assigned 2026-09-14T10:21:14Z for the backward-compatible icon update).
+- Gmail is loaded directly from `https://mail.google.com/` with a Safari user agent.
+- Main application behavior is in `src-tauri/src/lib.rs`; no frontend framework, HTML entry point, or bundler is present.
+- The release workflow runs on tags matching `v*` and builds macOS, Windows, Ubuntu/Debian, and Arch artifacts.
 
 ## User Preferences
 
-- Keep responses short and concise.
-- No emoji unless explicitly asked.
-- No trailing summaries — user can read the diff.
-- User tests manually on Windows; macOS works reliably.
-- User's GitHub account: **madratzz**.
-- User's email: raxashafique@gmail.com.
+- No active user preferences have been independently verified in this session.
 
 ## Naming Conventions
 
-- Rust functions: `snake_case`.
-- Icon files: `gmail-color.png`, `gmail-dark.png`, `gmail-white.png`.
-- Child webview label: `"peek"`.
-- Archive filenames: `type-DD-MM-YY-slug.md`.
-- Git tags: `vMAJOR.MINOR.PATCH` or `vMAJOR.MINOR.PATCH-alpha.N`.
+- Rust functions use `snake_case`.
+- Gmail menu-icon assets use `gmail-color.png`, `gmail-dark.png`, and `gmail-white.png`.
+- Archive filenames use `type-YYYY-MM-DD[-short-gist][-NN].md`.
+- The repository policy defines release versions as `X.Y.Z`, with epoch minutes as `Z`; confirm any transition from existing versioning before publishing.
 
 ## Important Entities
 
 | Entity | Details |
 |---|---|
-| GitHub repo | https://github.com/madratzz/tauri-google-mail |
-| Local path | E:\GitProjects\tauri-google-mail |
-| CI workflow | .github/workflows/release.yml — triggers on `v*` tags |
-| Icon source | https://dashboardicons.com/icons/external/gmail (selfhst CDN, CC BY 4.0) |
-| Tauri CLI | `@tauri-apps/cli ^2.0.0` (devDependency, invoked via `npx tauri`) |
-| Rust toolchain | stable-msvc on Windows |
-| MSVC version | 14.44.35207 |
-| Windows SDK | 10.0.26100.0 |
+| Tauri runtime | Tauri 2 with `image-png` and `unstable` features |
+| Main URL | `https://mail.google.com/` |
+| Release workflow | `.github/workflows/release.yml` |
+| Windows behavior guide | `docs/windows-popup-bugs.md` |
+| macOS signing guide | `docs/macos-damaged-release.md` |
 
 ## Do Not Forget
 
-- On Windows, `on_navigation` fires on a WebView2 background thread — **always** use `tauri::async_runtime::spawn` for any window op inside that callback.
-- `peek.url()` is unreliable on Windows after sentinel navigation — always read URL from `PeekUrl` app state instead.
-- `win.close()` on Windows may not fully release the WebView2 process — use `prevent_close()` + `win.destroy()` in `CloseRequested` handler.
-- Windows builds fail without manually setting `LIB` and `INCLUDE` env vars if not running from VS Developer Command Prompt.
-- `tauri icon <source.png>` regenerates all icon sizes and formats including `.ico`, `.icns`, and all Windows APPX sizes.
+- In Windows WebView2 navigation callbacks, use `tauri::async_runtime::spawn` before doing window operations.
+- Read the stored `PeekUrl` rather than querying `peek.url()` after sentinel navigation.
+- Preserve the established forced `destroy()` close behavior for standalone Windows windows unless it is replaced with targeted testing.
+- Keep `.agents/` and `.archive/` in version control; do not add them to `.gitignore`.
 
 ## Archive Summary
 
-No archived memory yet. Initial setup 2026-05-28.
+The original bootstrap memory is preserved in a redacted 2026-05-28 snapshot. It included machine-specific environment guidance that is intentionally no longer active.
 
 ## Archive Pointers
 

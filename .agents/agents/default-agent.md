@@ -1,59 +1,36 @@
 # Default Agent
 
-Last updated: 2026-05-28
+Last updated: 2026-09-14
 
 ## Agent Role
 
-This agent maintains and extends the Gmail Desktop Tauri 2 app. It handles feature development, bug fixes, icon/asset updates, CI/release management, and agent context maintenance.
+Maintain the Gmail Desktop codebase and its active context, durable memory, learnings, logs, and archives while following the repository-wide rules in [AGENTS.md](../../AGENTS.md).
 
 ## Operating Rules
 
-- Read `.agents/context.md` first.
-- Read `.agents/memory.md` second.
-- Read `.agents/learnings.md` third.
-- Read `.agents/logs.md` fourth.
-- Update active files after meaningful work.
-- Archive older files when the date changes or active files become too large.
-- Never delete historical context without archiving it first.
-- Keep summaries concise but useful.
-- Use relative links.
-- Do not store secrets, API keys, passwords, tokens, private keys, or credentials.
+- Read `context.md` first, then relevant `memory.md`, `learnings.md`, and `logs.md` before meaningful work.
+- Treat `AGENTS.md` as authoritative for Git, pull-request, versioning, documentation, sensitive-data, and archive policy.
+- Update active context only when it adds durable value. Keep entries concise and distinguish verified facts from assumptions.
+- Re-read shared files immediately before edits; merge rather than overwrite concurrent changes.
+- Archive detailed older material before trimming it from active files. Verify the file and index link first; never edit verified archive snapshots.
+- Use relative links and reverse-chronological ordering for logs and archive indexes.
+- Never store credentials, tokens, passwords, private keys, personal data, internal URLs, or machine-specific environment values.
 
 ## Project Context
 
-Gmail Desktop is a Tauri 2 cross-platform desktop app that wraps `mail.google.com` in a system webview. The entire app logic is in `src-tauri/src/lib.rs`. There is no JS frontend. It uses a Safari user-agent, a peek overlay for in-app link previews, a pop-out button to open links in standalone windows, and an icon switcher menu.
-
-**Critical Windows behaviors to remember:**
-- `on_navigation` fires on a WebView2 background thread — always use `tauri::async_runtime::spawn` for window ops inside it.
-- `peek.url()` may return the sentinel URL after navigation cancel — read URL from `PeekUrl` app state instead.
-- Use `prevent_close()` + `win.destroy()` for reliable window closing on Windows.
+Gmail Desktop is a pure Rust/Tauri 2 Gmail wrapper. `src-tauri/src/lib.rs` contains the primary application logic. Preserve documented WebView2 protections: asynchronous navigation-triggered window operations, `PeekUrl` storage before sentinel navigation, and reliable standalone-window shutdown behavior.
 
 ## Responsibilities
 
-- Maintain context, logs, memory, learnings, archives.
-- Keep archive indexes updated.
-- Implement features and bug fixes in `src-tauri/src/lib.rs`.
-- Manage releases via git tags triggering GitHub Actions CI.
+- Maintain active context and only the relevant archive indexes.
+- Preserve current implementation constraints and update project documentation with meaningful work.
+- Validate changed links, filenames, ordering, and obvious sensitive-data redaction before handoff.
 
 ## Workflow
 
-1. Read active context files (context → memory → learnings → logs).
-2. Perform the requested task.
-3. Update `.agents/logs.md`.
-4. Update `.agents/memory.md` if stable facts were discovered.
-5. Update `.agents/learnings.md` if new lessons were learned.
-6. Update `.agents/context.md` if project direction, structure, or goals changed.
-7. Archive old material when needed.
-8. Update all relevant indexes.
-
-## Agent Maintenance Checklist
-
-- [ ] Updated `.agents/logs.md`.
-- [ ] Updated `.agents/context.md` if goals, architecture, structure, or constraints changed.
-- [ ] Updated `.agents/memory.md` if stable facts were discovered.
-- [ ] Updated `.agents/learnings.md` if useful lessons were learned.
-- [ ] Archived old material if the date changed or files became too large.
-- [ ] Updated `.agents/INDEX.md`.
-- [ ] Updated relevant `.archive/*/INDEX.md` files.
-- [ ] Redacted sensitive data.
-- [ ] Preserved useful summaries in active files.
+1. Read the active files and applicable repository documentation.
+2. Perform the scoped task.
+3. Update `.agents/logs.md` for meaningful work.
+4. Update memory, learnings, and context only when the task warrants it.
+5. Archive old material on a date change or soft-size threshold, then verify it.
+6. Update affected indexes and documentation.

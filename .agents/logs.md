@@ -1,61 +1,78 @@
 # Active Logs
 
-Last updated: 2026-05-28
+Last updated: 2026-09-14
 
 ## Current Session
 
-### 2026-05-28
+### 2026-09-14T15:21:14+05:00 — codex/root
 
-**Summary:** Full project bootstrap — created Tauri 2 Gmail desktop app from scratch, fixed three Windows-specific bugs, updated icons, and pushed alpha release v1.0.0-alpha.1.
+Replaced the primary Gmail launcher icon with a faithful square rendition of the supplied current Google Mail mark and regenerated Tauri’s desktop icon formats. Updated the app version to `1.1.29823021` in every package and Tauri manifest.
 
-**Files touched:**
-- `src-tauri/src/lib.rs` — entire app logic, multiple iterations
-- `src-tauri/Cargo.toml` — dependencies, crate config
-- `src-tauri/tauri.conf.json` — app config, CSP null
-- `.github/workflows/release.yml` — CI release workflow
-- `src-tauri/icons/gmail-color.png` — replaced with dashboardicons.com version
-- `src-tauri/icons/gmail-dark.png` — replaced with dashboardicons.com version
-- `src-tauri/icons/gmail-white.png` — replaced with dashboardicons.com light variant
-- `src-tauri/icons/icon.png / icon.ico / icon.icns` — regenerated from gmail-color.png
-- All APPX tile PNGs — regenerated via `npx tauri icon`
-- `package.json` — Tauri CLI devDependency
-- `src-tauri/Cargo.lock` — committed
-- `package-lock.json` — committed
-- `.gitignore` — added `.claude/`
-- `.agents/*` — created agent context system
-- `.archive/*` — created archive structure
+Files touched:
 
-**Decisions made:**
-- No JS frontend — pure Rust + Tauri 2 webview wrapper.
-- Safari user-agent to pass Google browser checks.
-- Peek overlay uses `add_child()` with `unstable` Tauri feature.
-- Sentinel URL `peek-action.tauri.internal` for toolbar actions.
-- `tauri::async_runtime::spawn` for all window ops inside `on_navigation` (deadlock fix).
-- `PeekUrl` Mutex app state to reliably pass URL to `expand_peek` (race condition fix).
-- `prevent_close()` + `destroy()` for standalone window close (WebView2 release fix).
-- Icons sourced from dashboardicons.com / selfhst CDN (CC BY 4.0).
+- `src-tauri/icons/gmail-color.png`
+- `src-tauri/icons/icon.png`, `icon.ico`, `icon.icns`, and generated platform PNG variants
+- `package.json`, `package-lock.json`, `src-tauri/Cargo.toml`, `src-tauri/Cargo.lock`, and `src-tauri/tauri.conf.json`
+- `.agents/context.md`, `.agents/memory.md`, and `.agents/logs.md`
 
-**Issues found and fixed:**
-1. **White pop-out window** — `peek.url()` returned sentinel URL on Windows. Fixed with `PeekUrl` state.
-2. **Close button broken on pop-out** — `win.navigate()` inside `on_new_window` corrupted WebView2. Fixed with `open_standalone_window()` helper.
-3. **Both windows freeze/deadlock** — `expand_peek` called from `on_navigation` background thread tried to do main-thread ops. Fixed with `tauri::async_runtime::spawn`.
-4. **LNK1181 linker error** — missing `LIB` env var for Windows SDK. Fixed by setting MSVC env vars before build.
-5. **`.claude/` accidentally staged** — removed with `git rm --cached`, added to `.gitignore`.
+Decisions made:
 
-**Next steps:**
-- Monitor GitHub Actions build for v1.0.0-alpha.1 at https://github.com/madratzz/tauri-google-mail/actions
-- Publish the draft release at https://github.com/madratzz/tauri-google-mail/releases when builds complete.
-- Consider unread badge / notification count feature.
-- Consider multiple simultaneous peek overlay support.
+- Used `1.1.29823021`: minor `1` denotes a backward-compatible visual update; `29823021` is the UTC epoch minute assigned at 2026-09-14T10:21:14Z.
+- Retained the existing dark and white runtime menu variants; the primary color launcher icon now uses the supplied current mark.
+
+Next steps:
+
+- Run a native app build or inspect a packaged artifact before release publication.
+- Documentation review: no end-user documentation described the launcher artwork or exact current version, so the manifest and agent-context updates are the relevant documentation changes.
+
+### 2026-09-14T15:07:37+05:00 — codex/root
+
+Updated the repository agent-context system. Added canonical root instructions and a Claude pointer, archived the stale 2026-05-28 active material into verified dated snapshots, refreshed active context from current repository sources, and redacted personal and machine-specific information.
+
+Files touched:
+
+- `AGENTS.md`
+- `CLAUDE.md`
+- `.agents/README.md`
+- `.agents/INDEX.md`
+- `.agents/context.md`
+- `.agents/memory.md`
+- `.agents/learnings.md`
+- `.agents/logs.md`
+- `.agents/agents/default-agent.md`
+- `.archive/README.md`
+- `.archive/INDEX.md`
+- `.archive/{logs,memory,learnings,context,agents}/INDEX.md`
+- Five dated archive snapshots under `.archive/`
+
+Decisions made:
+
+- Root `AGENTS.md` is the authoritative repository instruction file; `CLAUDE.md` points to it.
+- The May bootstrap material remains available only through redacted, immutable archives.
+- Current context distinguishes verified repository facts from release-state questions.
+
+Issues found:
+
+- The active context was stale and included personal and machine-specific information.
+- The requested Git workflow requires `development`, but only `master` and `origin/master` currently exist.
+
+Next steps:
+
+- Confirm the intended branch policy before starting future branch or pull-request work.
+- Confirm the intended release version state before publishing another release.
+- Documentation review: the new root instructions and agent-context documentation are the substantive documentation update for this task.
 
 ## Recent Previous Sessions
 
-No previous sessions recorded yet.
+### 2026-05-28 — initial project bootstrap
+
+Created the original Gmail Desktop application, platform notes, release setup, icons, and initial context system. The detailed log is preserved in the archive.
 
 ## Archive Summary
 
-No archived logs yet. Initial setup 2026-05-28.
+Detailed bootstrap work was archived on 2026-09-14 after the active-context date changed.
 
 ## Archive Pointers
 
+- [logs-2026-05-28-project-bootstrap.md](../.archive/logs/logs-2026-05-28-project-bootstrap.md)
 - [Archived Logs Index](../.archive/logs/INDEX.md)

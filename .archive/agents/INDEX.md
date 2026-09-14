@@ -1,7 +1,9 @@
 # Archived Agents Index
 
-Last updated: 2026-05-28
+Schema version: 1
+
+Last updated: 2026-09-14
 
 | Date | File | Summary |
 |---|---|---|
-| — | — | No archived agent files yet. Active agent file is in [../../.agents/agents/default-agent.md](../../.agents/agents/default-agent.md). |
+| 2026-05-28 | [default-agent-2026-05-28-project-bootstrap.md](default-agent-2026-05-28-project-bootstrap.md) | Superseded initial default-agent profile |

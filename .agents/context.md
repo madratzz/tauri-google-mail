@@ -1,79 +1,55 @@
 # Active Project Context
 
-Last updated: 2026-05-28
+Last updated: 2026-09-14
 
 ## Project Summary
 
-**Gmail Desktop** is a Tauri 2 cross-platform desktop wrapper for Gmail (mail.google.com). It loads Gmail directly inside a system webview (WebView2 on Windows, WKWebView on macOS) with no JavaScript frontend framework. The entire app logic lives in a single Rust file: `src-tauri/src/lib.rs`.
-
-GitHub: https://github.com/madratzz/tauri-google-mail  
-Account: madratzz
+Gmail Desktop is a cross-platform Rust/Tauri 2 wrapper for Gmail. It loads `https://mail.google.com/` directly in a native webview; there is no JavaScript frontend. The current manifest version is `1.1.29823021`.
 
 ## Current Goals
 
-- Maintain and ship stable cross-platform Gmail desktop app.
-- Alpha release v1.0.0-alpha.1 just tagged and pushed — GitHub Actions CI building for macOS/Windows/Linux.
-- Continue iterating on UX: icon variants, peek overlay, pop-out stability.
+- Maintain a stable Gmail desktop wrapper across macOS, Windows, and Linux.
+- Preserve the established peek-overlay and standalone-window behavior.
+- Keep project instructions and active agent context accurate, concise, and free of sensitive data.
 
 ## Current Architecture / Structure
 
-```
-tauri-google-mail/
-  src-tauri/
-    src/
-      lib.rs          ← entire app logic (Rust)
-      main.rs         ← calls gmail_desktop_lib::run()
-    icons/
-      icon.png / icon.ico / icon.icns   ← main app icon (Gmail color)
-      gmail-color.png                   ← icon switcher: color variant
-      gmail-dark.png                    ← icon switcher: dark variant
-      gmail-white.png                   ← icon switcher: light/white variant
-    Cargo.toml
-    tauri.conf.json
-  .github/
-    workflows/
-      release.yml     ← builds macOS/Windows/Linux on v* tags
-  package.json        ← tauri CLI dev dependency only
-  .agents/            ← agent context system (this folder)
-  .archive/           ← agent context archives
+```text
+src-tauri/src/lib.rs        Main Tauri application logic
+src-tauri/src/main.rs       Native entry point
+src-tauri/icons/            Application and menu icon assets
+src-tauri/tauri.conf.json   Tauri bundle and runtime configuration
+.github/workflows/release.yml  Tag-triggered cross-platform releases
+docs/                       Platform-specific operational notes
+.agents/                    Active agent context
+.archive/                   Immutable historical context snapshots
 ```
 
-**Key Rust structures:**
-- `PeekUrl(Mutex<Option<tauri::Url>>)` — app state storing the real URL before peek webview creation, avoids sentinel-URL race on Windows/WebView2.
-- `create_peek_overlay()` — spawns a child webview at 85% window size centered.
-- `expand_peek()` — reads URL from `PeekUrl` state, closes peek, opens standalone window.
-- `close_peek()` — closes the peek child webview.
-- `open_standalone_window()` — creates an independent WebviewWindow, handles recursive new-window interception.
-
-**Sentinel URL pattern:** Peek toolbar buttons navigate to `peek-action.tauri.internal/expand` and `/close`. `on_navigation` catches these and spawns async tasks to act on them.
+The Tauri app uses a Safari user agent, a child-webview peek overlay for new-window links, sentinel navigation for overlay controls, and standalone windows for pop-outs. `PeekUrl` retains the original URL before sentinel navigation.
 
 ## Important Decisions
 
-- No JS frontend — Gmail URL loaded directly in webview. Keeps the app minimal and avoids build complexity.
-- Safari user-agent — required to pass Google's browser compatibility check for Gmail.
-- `tauri::async_runtime::spawn` wrapping all window ops inside `on_navigation` — fixes Windows/WebView2 deadlock where navigation callbacks fire on a background thread.
-- `PeekUrl` state — fixes Windows race condition where `peek.url()` returns the sentinel URL by the time `expand_peek` reads it.
-- `win.destroy()` via `CloseRequested` + `prevent_close()` — forces WebView2 to release properly; plain `win.close()` was unreliable.
-- Icons sourced from dashboardicons.com (selfhst/icons CDN), CC BY 4.0.
+- Keep the application pure Rust/Tauri; do not add a frontend framework without explicit approval.
+- Keep Tauri 2 APIs and the `unstable` feature needed by child-webview support.
+- Keep WebView2 navigation callbacks free of direct window operations; dispatch those operations asynchronously.
+- Maintain active context in `.agents/` and immutable historical context in `.archive/`.
 
 ## Active Constraints
 
-- Tauri 2 API only — no Tauri v1 patterns.
-- Windows builds require MSVC toolchain with specific env vars (`LIB`, `INCLUDE`, `PATH`) pointing to MSVC 14.44.35207 and Windows SDK 10.0.26100.0.
-- `crate-type = ["staticlib", "cdylib", "rlib"]` required in Cargo.toml for Tauri 2 lib builds.
-- `unstable` feature flag required in Tauri for `add_child()` (peek overlay).
-- Do not add a JS frontend or build tool — keep it pure Rust + Tauri.
-- Do not commit `.claude/` directory (in .gitignore).
+- The root [AGENTS.md](../AGENTS.md) is the canonical repository instruction file.
+- The repository currently has `master` as its local and remote default branch; no `development` branch was found on 2026-09-14. The documented branch policy therefore needs user direction before future branch or pull-request work.
+- Do not store personal data, credentials, internal URLs, or machine-specific environment values in agent context.
 
 ## Current Open Questions
 
-- Should the peek overlay support multiple simultaneous overlays, or always replace the existing one?
-- Consider adding a notification badge / unread count in the dock/taskbar.
+- Decide whether multiple simultaneous peek overlays are a desired product behavior.
+- Decide whether unread-count or notification-badge support is in scope.
 
 ## Archive Summary
 
-No archived context yet. This is the initial setup on 2026-05-28.
+The 2026-05-28 bootstrap context, memory, learnings, logs, and default agent profile were archived and redacted on 2026-09-14. They document the original WebView2 fixes and project setup.
 
 ## Archive Pointers
 
 - [Archived Context Index](../.archive/context/INDEX.md)
+- [Archived Learnings Index](../.archive/learnings/INDEX.md)

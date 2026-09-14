@@ -1,7 +1,9 @@
 # Archived Logs Index
 
-Last updated: 2026-05-28
+Schema version: 1
+
+Last updated: 2026-09-14
 
 | Date | File | Summary |
 |---|---|---|
-| — | — | No archived logs yet. Active logs are in [../../.agents/logs.md](../../.agents/logs.md). |
+| 2026-05-28 | [logs-2026-05-28-project-bootstrap.md](logs-2026-05-28-project-bootstrap.md) | Redacted initial project bootstrap and Windows pop-out fixes |

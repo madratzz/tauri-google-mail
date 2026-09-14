@@ -1,16 +1,18 @@
 # Agent Context Index
 
-Last updated: 2026-05-28
+Schema version: 1
+
+Last updated: 2026-09-14
 
 ## Active Files
 
 | File | Purpose | Last Updated | Notes |
 |---|---|---:|---|
-| [context.md](context.md) | Current holistic project context | 2026-05-28 | Active summary |
-| [memory.md](memory.md) | Persistent project memory | 2026-05-28 | Stable facts |
-| [learnings.md](learnings.md) | Lessons and discoveries | 2026-05-28 | Recent learnings |
-| [logs.md](logs.md) | Recent working logs | 2026-05-28 | Current session logs |
-| [agents/default-agent.md](agents/default-agent.md) | Default agent operating file | 2026-05-28 | Agent-specific rules |
+| [context.md](context.md) | Current holistic project context | 2026-09-14 | Refreshed from repository sources |
+| [memory.md](memory.md) | Persistent project memory | 2026-09-14 | Verified facts; no personal data |
+| [learnings.md](learnings.md) | Lessons and discoveries | 2026-09-14 | Windows/WebView2 constraints retained |
+| [logs.md](logs.md) | Recent working logs | 2026-09-14 | Initial bootstrap archived |
+| [agents/default-agent.md](agents/default-agent.md) | Default agent operating file | 2026-09-14 | Defers to root instructions |
 
 ## Archive Links
 
@@ -23,4 +25,4 @@ Last updated: 2026-05-28
 
 ## Notes
 
-Keep this index updated whenever active files or archive files change.
+Update this index only when the active file set or its metadata changes.
