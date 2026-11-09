@@ -41,6 +41,10 @@ const SAFARI_USER_AGENT: &str = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)
 const COLOR_ICON: &[u8] = include_bytes!("../icons/gmail-color.png");
 const DARK_ICON: &[u8] = include_bytes!("../icons/gmail-dark.png");
 const WHITE_ICON: &[u8] = include_bytes!("../icons/gmail-white.png");
+/// Monochrome menu-bar icon; macOS tints template images white or black to
+/// match the menu bar.
+#[cfg(target_os = "macos")]
+const TRAY_TEMPLATE_ICON: &[u8] = include_bytes!("../icons/tray-template.png");
 /// Gmail's light background; shown instead of a white flash while loading.
 const BACKGROUND: Color = Color(246, 248, 252, 255);
 const ZOOM_STEP: f64 = 0.1;
@@ -374,8 +378,14 @@ fn build_tray(app: &AppHandle) -> tauri::Result<()> {
             &MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?,
         ],
     )?;
-    TrayIconBuilder::with_id("tray")
-        .icon(Image::from_bytes(COLOR_ICON)?)
+    #[cfg(target_os = "macos")]
+    let builder = TrayIconBuilder::with_id("tray")
+        .icon(Image::from_bytes(TRAY_TEMPLATE_ICON)?)
+        .icon_as_template(true);
+    // Windows/Linux taskbars may be light, where a white icon would vanish.
+    #[cfg(not(target_os = "macos"))]
+    let builder = TrayIconBuilder::with_id("tray").icon(Image::from_bytes(COLOR_ICON)?);
+    builder
         .tooltip("Gmail")
         .menu(&menu)
         .show_menu_on_left_click(false)

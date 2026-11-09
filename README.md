@@ -5,7 +5,7 @@ A small Rust/Tauri desktop wrapper for Gmail.
 The app opens `https://mail.google.com/` in a native desktop webview with native Gmail, Edit, View, Window, and Icon menus.
 
 - **Unread count** appears in the window title, the dock/taskbar badge (macOS and supported Linux desktops), and the tray tooltip. A desktop notification is shown when new mail arrives while the window is in the background.
-- **System tray**: closing the window hides it to the tray; click the tray icon to toggle it, or use the tray menu to compose or quit.
+- **System tray**: on macOS the menu-bar icon is a monochrome Gmail "M" that follows the menu bar colour; closing the window hides it to the tray; click the tray icon to toggle it, or use the tray menu to compose or quit.
 - **`mailto:` links** open a Gmail compose window, both inside Gmail and from other apps once Gmail Desktop is set as your default mail app. A second launch focuses the running window.
 - **Links**: Google links that open in a new tab appear in an in-app peek overlay (press Esc or **Close** to dismiss, **Pop out** for a standalone window). Links to other sites open in your default browser.
 - **Zoom** with Ctrl/Cmd `+`, `-`, and `0`.
