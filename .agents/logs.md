@@ -34,6 +34,10 @@ Release `v1.2.7499` published from `main` via a manual workflow run (tag pushes 
 
 macOS tray icon now uses `src-tauri/icons/tray-template.png` (44px monochrome M rendered from `src-tauri/icons/gmail-dark.svg`; `gmail-light.svg` is the white variant, both added as source art) as a template image, so macOS tints it white/black like other menu-bar icons. Windows/Linux keep the colour icon. README tray bullet updated. macOS-only code path could not be compiled in the Linux agent environment; CI release build on macOS will verify it.
 
+### 2026-11-09T22:00:00Z — claude/serene-goodall-xyarrc
+
+Gmail's "Enable desktop notifications" OK button did nothing on macOS because WKWebView has no Notification API. Added `NOTIFICATION_SHIM_JS` (main window, `mail.google.com` only) that reports permission as granted and forwards each Gmail notification to a new `notify` command, plus `capabilities/gmail-notifications.json` granting only `allow-notify` to the remote Gmail origin (declared via `AppManifest` in `build.rs`). The unread-count fallback notification stops once Gmail sends its own. Not verified end to end in the agent environment (needs a signed-in Gmail session).
+
 ## Archive Summary
 
 Earlier sessions (2026-05-28 bootstrap; 2026-09-14 icon refresh and agent-context setup) are archived.
