@@ -14,7 +14,7 @@ sha256sums=('SKIP')
 build() {
   cd "tauri-google-mail-${pkgver}"
   npm ci
-  npm run tauri build -- --bundles deb
+  npm run tauri build -- --no-bundle
 }
 
 package() {

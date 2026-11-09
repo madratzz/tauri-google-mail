@@ -15,7 +15,7 @@ Gmail Desktop is a Rust/Tauri 2 desktop wrapper for Gmail. It has no JavaScript 
 - Open a pull request for each merge. Merge feature branches into `development` only through that pull request; do not directly merge or squash merge. Update `main` only through a release pull request from `development`.
 - Do not commit unrelated changes, rewrite shared history, force-push, or change Git configuration without explicit user approval.
 - If `development` does not exist or the policy conflicts with enforced repository rules, stop and report the conflict before creating a branch or pull request.
-- Assign versions as `X.Y.Z`: increase `X` only for intentional breaking releases and `Y` only for backward-compatible features. Set `Z` to `floor(unix_timestamp_seconds / 60)` in UTC; never reuse or decrease it. Record the version, UTC assignment time, and major/minor reason in release documentation.
+- Assign versions as `X.Y.Z`: increase `X` only for intentional breaking releases and `Y` only for backward-compatible features. Set `Z` to `floor((unix_timestamp_seconds - 1767225600) / 3600)` (whole UTC hours since 2026-01-01T00:00:00Z); never reuse it, and never decrease it within the same `X.Y`. `Z` must stay at or below 65535 because Windows MSI packages reject larger build numbers (this scheme reaches that limit in 2033). Record the version, UTC assignment time, and major/minor reason in release documentation.
 
 ## Documentation and naming
 

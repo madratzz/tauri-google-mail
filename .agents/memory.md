@@ -6,7 +6,7 @@ Last updated: 2026-09-14
 
 - Product name: Gmail Desktop. Bundle identifier: `com.madratzz.gmail-desktop`.
 - Rust package: `gmail-desktop`; library: `gmail_desktop_lib`.
-- Current manifest version: `1.1.29823021` in `package.json`, `package-lock.json`, `src-tauri/Cargo.toml`, and `src-tauri/tauri.conf.json` (assigned 2026-09-14T10:21:14Z for the backward-compatible icon update).
+- Current manifest version: `1.2.7499` (assigned 2026-11-09T11:12:46Z; minor bump for backward-compatible tray, badge, mailto, and window-state features) in `package.json`, `package-lock.json`, `src-tauri/Cargo.toml`, and `src-tauri/tauri.conf.json` (assigned 2026-09-14T10:21:14Z for the backward-compatible icon update).
 - Gmail is loaded directly from `https://mail.google.com/` with a Safari user agent.
 - Main application behavior is in `src-tauri/src/lib.rs`; no frontend framework, HTML entry point, or bundler is present.
 - The release workflow runs on tags matching `v*` and builds macOS, Windows, Ubuntu/Debian, and Arch artifacts.
@@ -20,7 +20,7 @@ Last updated: 2026-09-14
 - Rust functions use `snake_case`.
 - Gmail menu-icon assets use `gmail-color.png`, `gmail-dark.png`, and `gmail-white.png`.
 - Archive filenames use `type-YYYY-MM-DD[-short-gist][-NN].md`.
-- The repository policy defines release versions as `X.Y.Z`, with epoch minutes as `Z`; confirm any transition from existing versioning before publishing.
+- The repository policy defines release versions as `X.Y.Z`, with `Z` = whole UTC hours since 2026-01-01 (MSI caps `Z` at 65535). The user approved the switch from epoch minutes on 2026-11-09.
 
 ## Important Entities
 
