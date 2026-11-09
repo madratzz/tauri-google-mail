@@ -1,5 +1,7 @@
 # Windows Popup/Pop-Out Bugs in Tauri 2
 
+> Since 1.2: the `beforeunload` suppression script and the `prevent_close()` + `destroy()` close path are compiled only on Windows (`#[cfg(windows)]` in `src-tauri/src/lib.rs`). macOS and Linux pop-outs use the normal close path and keep Gmail's unsaved-changes guard. Pop-outs now open only for Google hosts; other links go to the default browser.
+
 All three bugs are Windows-only. Root cause: WebView2 fires `on_navigation` callbacks on a **background thread**, unlike WKWebView on macOS which fires on the main thread.
 
 ---

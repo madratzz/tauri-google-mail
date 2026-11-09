@@ -1,10 +1,10 @@
 # Active Project Context
 
-Last updated: 2026-09-14
+Last updated: 2026-11-09
 
 ## Project Summary
 
-Gmail Desktop is a cross-platform Rust/Tauri 2 wrapper for Gmail. It loads `https://mail.google.com/` directly in a native webview; there is no JavaScript frontend. The current manifest version is `1.1.29823021`.
+Gmail Desktop is a cross-platform Rust/Tauri 2 wrapper for Gmail. It loads `https://mail.google.com/` directly in a native webview; there is no JavaScript frontend. The current manifest version is `1.2.7499`.
 
 ## Current Goals
 
@@ -25,7 +25,7 @@ docs/                       Platform-specific operational notes
 .archive/                   Immutable historical context snapshots
 ```
 
-The Tauri app uses a Safari user agent, a child-webview peek overlay for new-window links, sentinel navigation for overlay controls, and standalone windows for pop-outs. `PeekUrl` retains the original URL before sentinel navigation.
+The Tauri app uses a Safari user agent, a child-webview peek overlay for new-window links, sentinel navigation for overlay controls, and standalone windows for pop-outs. `PeekUrl` retains the original URL before sentinel navigation. Since 1.2 the app also uses the single-instance, deep-link (`mailto`), opener, notification, and window-state plugins plus a tray icon; non-Google links open in the system browser.
 
 ## Important Decisions
 
@@ -43,7 +43,6 @@ The Tauri app uses a Safari user agent, a child-webview peek overlay for new-win
 ## Current Open Questions
 
 - Decide whether multiple simultaneous peek overlays are a desired product behavior.
-- Decide whether unread-count or notification-badge support is in scope.
 
 ## Archive Summary
 
