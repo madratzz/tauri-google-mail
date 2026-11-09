@@ -28,7 +28,7 @@ Next steps:
 
 ### 2026-11-09T18:45:00Z — claude/serene-goodall-xyarrc
 
-Release `v1.2.7499` published from `main` via a manual workflow run (tag pushes are blocked from the agent environment). The Arch job built but skipped upload because its steps required a tag ref. `release.yml` now reads the version from `Cargo.toml`, always uploads the Arch package and PKGBUILD to `v<version>`, and has an `arch_only` dispatch input to add the Arch package to an existing release without rebuilding other platforms. Documentation review: this log entry is the documentation update.
+Release `v1.2.7499` published from `main` via a manual workflow run (tag pushes are blocked from the agent environment). The Arch job built but skipped upload because its steps required a tag ref. `release.yml` now reads the version from `Cargo.toml`, always uploads the Arch package and PKGBUILD to `v<version>` (via `gh release upload --clobber`, because editing the existing release with `softprops/action-gh-release` was refused with "Resource not accessible by integration"), and has an `arch_only` dispatch input to add the Arch package to an existing release without rebuilding other platforms. Documentation review: this log entry is the documentation update.
 
 ## Archive Summary
 
