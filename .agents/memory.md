@@ -6,7 +6,7 @@ Last updated: 2026-09-14
 
 - Product name: Gmail Desktop. Bundle identifier: `com.madratzz.gmail-desktop`.
 - Rust package: `gmail-desktop`; library: `gmail_desktop_lib`.
-- Current manifest version: `1.2.7499` (assigned 2026-11-09T11:12:46Z; minor bump for backward-compatible tray, badge, mailto, and window-state features) in `package.json`, `package-lock.json`, `src-tauri/Cargo.toml`, and `src-tauri/tauri.conf.json` (assigned 2026-09-14T10:21:14Z for the backward-compatible icon update).
+- Current manifest version: `1.2.7509` (assigned 2026-11-09T21:28:30Z; patch for the macOS template tray icon) in `package.json`, `package-lock.json`, `src-tauri/Cargo.toml`, and `src-tauri/tauri.conf.json` (assigned 2026-09-14T10:21:14Z for the backward-compatible icon update).
 - Gmail is loaded directly from `https://mail.google.com/` with a Safari user agent.
 - Main application behavior is in `src-tauri/src/lib.rs`; no frontend framework, HTML entry point, or bundler is present.
 - The release workflow runs on tags matching `v*` and builds macOS, Windows, Ubuntu/Debian, and Arch artifacts.

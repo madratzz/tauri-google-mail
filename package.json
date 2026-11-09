@@ -1,7 +1,7 @@
 {
   "name": "tauri-google-mail",
   "private": true,
-  "version": "1.2.7499",
+  "version": "1.2.7509",
   "type": "module",
   "scripts": {
     "dev": "tauri dev",
