@@ -32,7 +32,7 @@ Release `v1.2.7499` published from `main` via a manual workflow run (tag pushes 
 
 ### 2026-11-09T20:10:00Z — claude/serene-goodall-xyarrc
 
-macOS tray icon now uses `src-tauri/icons/tray-template.png` (44px monochrome M cropped from `gmail-white.png`) as a template image, so macOS tints it white/black like other menu-bar icons. Windows/Linux keep the colour icon. README tray bullet updated. macOS-only code path could not be compiled in the Linux agent environment; CI release build on macOS will verify it.
+macOS tray icon now uses `src-tauri/icons/tray-template.png` (44px monochrome M rendered from `src-tauri/icons/gmail-dark.svg`; `gmail-light.svg` is the white variant, both added as source art) as a template image, so macOS tints it white/black like other menu-bar icons. Windows/Linux keep the colour icon. README tray bullet updated. macOS-only code path could not be compiled in the Linux agent environment; CI release build on macOS will verify it.
 
 ## Archive Summary
 
