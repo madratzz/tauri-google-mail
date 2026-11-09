@@ -5,6 +5,11 @@ on:
     tags:
       - 'v*'
   workflow_dispatch:
+    inputs:
+      arch_only:
+        description: 'Only build and upload the Arch package to the existing release for this version'
+        type: boolean
+        default: false
 
 concurrency:
   group: release-${{ github.ref }}
@@ -12,6 +17,7 @@ concurrency:
 
 jobs:
   publish-tauri:
+    if: ${{ !inputs.arch_only }}
     permissions:
       contents: write
     strategy:
@@ -66,6 +72,8 @@ jobs:
 
   publish-tauri-arch:
     needs: publish-tauri
+    # Run after a successful build, or on its own when arch_only skipped it.
+    if: ${{ !cancelled() && (needs.publish-tauri.result == 'success' || needs.publish-tauri.result == 'skipped') }}
     permissions:
       contents: write
     runs-on: ubuntu-latest
@@ -104,10 +112,9 @@ jobs:
 
       - name: Create Arch package (.pkg.tar.zst)
         run: |
-          VERSION="${GITHUB_REF_NAME#v}"
-          if [ -z "$VERSION" ]; then
-            VERSION=$(grep '^version' src-tauri/Cargo.toml | head -1 | sed 's/.*"\(.*\)"/\1/')
-          fi
+          # Manual runs use a branch ref, so always read the version from the manifest.
+          VERSION=$(grep '^version' src-tauri/Cargo.toml | head -1 | sed 's/.*"\(.*\)"/\1/')
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
 
           STAGING="$(pwd)/staging"
           mkdir -p "$STAGING/usr/bin" "$STAGING/usr/share/pixmaps" "$STAGING/usr/share/applications"
@@ -145,17 +152,15 @@ jobs:
           tar --zstd -cf "../gmail-desktop-${VERSION}-1-x86_64.pkg.tar.zst" .
 
       - name: Update PKGBUILD version and checksum
-        if: startsWith(github.ref, 'refs/tags/')
         run: |
-          VERSION="${GITHUB_REF_NAME#v}"
           sed -i "s/^pkgver=.*/pkgver=$VERSION/" PKGBUILD
           SHA=$(curl -sL "https://github.com/madratzz/tauri-google-mail/archive/v${VERSION}.tar.gz" | sha256sum | cut -d' ' -f1)
           sed -i "s/^sha256sums=.*/sha256sums=('$SHA')/" PKGBUILD
 
       - name: Upload Arch artifacts to release
-        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: v${{ env.VERSION }}
           files: |
             gmail-desktop-*-x86_64.pkg.tar.zst
             PKGBUILD

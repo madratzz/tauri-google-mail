@@ -26,6 +26,10 @@ Next steps:
 - Verify on macOS and Windows (downloads, Meet permissions, mailto default-handler registration, close-to-tray).
 - Consider updater, code signing, and a per-platform user agent.
 
+### 2026-11-09T18:45:00Z — claude/serene-goodall-xyarrc
+
+Release `v1.2.7499` published from `main` via a manual workflow run (tag pushes are blocked from the agent environment). The Arch job built but skipped upload because its steps required a tag ref. `release.yml` now reads the version from `Cargo.toml`, always uploads the Arch package and PKGBUILD to `v<version>`, and has an `arch_only` dispatch input to add the Arch package to an existing release without rebuilding other platforms. Documentation review: this log entry is the documentation update.
+
 ## Archive Summary
 
 Earlier sessions (2026-05-28 bootstrap; 2026-09-14 icon refresh and agent-context setup) are archived.
