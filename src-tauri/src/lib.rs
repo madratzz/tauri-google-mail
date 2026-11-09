@@ -30,6 +30,9 @@ struct AppState {
     zoom: Mutex<f64>,
     /// Set once the main window has been shown after the first page load.
     shown: AtomicBool,
+    /// Set once Gmail has sent its own (richer) notification; after that the
+    /// count-based fallback notification is skipped to avoid duplicates.
+    web_notifications: AtomicBool,
     /// Set when the user chose Quit, so close-to-tray does not intercept it.
     quitting: AtomicBool,
 }
@@ -122,6 +125,49 @@ const OFFLINE_JS: &str = r#"
 })();
 "#;
 
+/// Gmail asks for web-notification permission, but WKWebView has no
+/// Notification API, so the "OK" button does nothing. This shim reports the
+/// permission as granted and forwards each notification Gmail creates to the
+/// native `notify` command. Only `https://mail.google.com` may call it (see
+/// capabilities/gmail-notifications.json).
+const NOTIFICATION_SHIM_JS: &str = r#"
+(function() {
+    if (window.location.hostname !== 'mail.google.com') return;
+    function send(title, body) {
+        var ipc = window.__TAURI_INTERNALS__;
+        if (!ipc || typeof ipc.invoke !== 'function') return;
+        ipc.invoke('notify', { title: String(title || 'Gmail'), body: String(body || '') }).catch(function() {});
+    }
+    function GmailNotification(title, options) {
+        options = options || {};
+        this.title = title;
+        this.body = options.body || '';
+        this.tag = options.tag || '';
+        this.onclick = null; this.onclose = null; this.onerror = null; this.onshow = null;
+        send(title, this.body);
+    }
+    GmailNotification.prototype.close = function() {};
+    GmailNotification.prototype.addEventListener = function() {};
+    GmailNotification.prototype.removeEventListener = function() {};
+    Object.defineProperty(GmailNotification, 'permission', { get: function() { return 'granted'; } });
+    GmailNotification.requestPermission = function(callback) {
+        if (typeof callback === 'function') callback('granted');
+        return Promise.resolve('granted');
+    };
+    window.Notification = GmailNotification;
+    if (navigator.permissions && navigator.permissions.query) {
+        var query = navigator.permissions.query.bind(navigator.permissions);
+        navigator.permissions.query = function(desc) {
+            if (desc && desc.name === 'notifications') {
+                return Promise.resolve({ state: 'granted', status: 'granted', onchange: null,
+                    addEventListener: function() {}, removeEventListener: function() {} });
+            }
+            return query(desc);
+        };
+    }
+})();
+"#;
+
 /// Opens compose in the account currently shown instead of always `u/0`.
 const COMPOSE_JS: &str = r#"
 (function() {
@@ -165,6 +211,7 @@ pub fn run() {
             unread: Mutex::new(None),
             zoom: Mutex::new(1.0),
             shown: AtomicBool::new(false),
+            web_notifications: AtomicBool::new(false),
             quitting: AtomicBool::new(false),
         })
         .setup(|app| {
@@ -189,6 +236,7 @@ pub fn run() {
             restore_icon_choice(&handle);
             Ok(())
         })
+        .invoke_handler(tauri::generate_handler![notify])
         .on_menu_event(|app, event| handle_menu(app, event.id().as_ref()))
         .build(tauri::generate_context!())
         .expect("failed to build Gmail desktop app");
@@ -227,6 +275,7 @@ fn build_main_window(app: &AppHandle) -> tauri::Result<()> {
     .background_color(BACKGROUND)
     .user_agent(SAFARI_USER_AGENT)
     .initialization_script(OFFLINE_JS)
+    .initialization_script(NOTIFICATION_SHIM_JS)
     .on_navigation(move |url| {
         if url.scheme() == "mailto" {
             let app = nav_app.clone();
@@ -565,7 +614,11 @@ fn update_unread(app: &AppHandle, title: &str) {
 
         let focused = w.is_focused().unwrap_or(false);
         if let Some(prev) = previous {
-            if count > prev && !focused {
+            let gmail_notifies = app
+                .state::<AppState>()
+                .web_notifications
+                .load(Ordering::SeqCst);
+            if count > prev && !focused && !gmail_notifies {
                 let new = count - prev;
                 let _ = app
                     .notification()
@@ -588,6 +641,21 @@ fn update_unread(app: &AppHandle, title: &str) {
         };
         let _ = tray.set_tooltip(Some(tip));
     }
+}
+
+/// Shows a native notification for a web notification raised by Gmail.
+#[tauri::command]
+fn notify(app: AppHandle, title: String, body: String) {
+    app.state::<AppState>()
+        .web_notifications
+        .store(true, Ordering::SeqCst);
+    let clip = |s: String, n: usize| s.chars().take(n).collect::<String>();
+    let _ = app
+        .notification()
+        .builder()
+        .title(clip(title, 200))
+        .body(clip(body, 500))
+        .show();
 }
 
 /// Saves downloads (attachments) to the user's Downloads folder. Without a

@@ -4,7 +4,7 @@ Last updated: 2026-11-09
 
 ## Project Summary
 
-Gmail Desktop is a cross-platform Rust/Tauri 2 wrapper for Gmail. It loads `https://mail.google.com/` directly in a native webview; there is no JavaScript frontend. The current manifest version is `1.2.7509`.
+Gmail Desktop is a cross-platform Rust/Tauri 2 wrapper for Gmail. It loads `https://mail.google.com/` directly in a native webview; there is no JavaScript frontend. The current manifest version is `1.2.7510`.
 
 ## Current Goals
 

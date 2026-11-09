@@ -1,0 +1,10 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "gmail-notifications",
+  "description": "Lets the Gmail page in the main window forward its web notifications to native notifications. Grants only the app's notify command.",
+  "windows": ["main"],
+  "remote": {
+    "urls": ["https://mail.google.com/*"]
+  },
+  "permissions": ["allow-notify"]
+}
