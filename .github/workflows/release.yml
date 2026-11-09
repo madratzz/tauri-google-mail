@@ -95,6 +95,7 @@ jobs:
             patchelf \
             nodejs \
             npm \
+            github-cli \
             curl
 
       - name: Install Rust
@@ -158,11 +159,9 @@ jobs:
           sed -i "s/^sha256sums=.*/sha256sums=('$SHA')/" PKGBUILD
 
       - name: Upload Arch artifacts to release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: v${{ env.VERSION }}
-          files: |
-            gmail-desktop-*-x86_64.pkg.tar.zst
-            PKGBUILD
+        # Upload assets only; editing the existing release is refused for this token.
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          gh release upload "v${VERSION}" gmail-desktop-*-x86_64.pkg.tar.zst PKGBUILD --clobber --repo "$GITHUB_REPOSITORY"
