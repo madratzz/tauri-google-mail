@@ -30,6 +30,10 @@ Next steps:
 
 Release `v1.2.7499` published from `main` via a manual workflow run (tag pushes are blocked from the agent environment). The Arch job built but skipped upload because its steps required a tag ref. `release.yml` now reads the version from `Cargo.toml`, always uploads the Arch package and PKGBUILD to `v<version>` (via `gh release upload --clobber`, because editing the existing release with `softprops/action-gh-release` was refused with "Resource not accessible by integration"), and has an `arch_only` dispatch input to add the Arch package to an existing release without rebuilding other platforms. Documentation review: this log entry is the documentation update.
 
+### 2026-11-09T20:10:00Z — claude/serene-goodall-xyarrc
+
+macOS tray icon now uses `src-tauri/icons/tray-template.png` (44px monochrome M rendered from `src-tauri/icons/gmail-dark.svg`; `gmail-light.svg` is the white variant, both added as source art) as a template image, so macOS tints it white/black like other menu-bar icons. Windows/Linux keep the colour icon. README tray bullet updated. macOS-only code path could not be compiled in the Linux agent environment; CI release build on macOS will verify it.
+
 ## Archive Summary
 
 Earlier sessions (2026-05-28 bootstrap; 2026-09-14 icon refresh and agent-context setup) are archived.
